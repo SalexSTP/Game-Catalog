@@ -1,27 +1,46 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using Domain.Enums;
+using Services.DTOs;
+using Services.Interfaces;
 using Web.ViewModels;
+using Web.ViewModels.Home;
 
-namespace Web.Controllers
+namespace Web.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly IGameService gameService;
+
+    public HomeController(IGameService gameService)
     {
-        private readonly ILogger<HomeController> _logger;
+        this.gameService = gameService;
+    }
 
-        public HomeController(ILogger<HomeController> logger)
+    public async Task<IActionResult> Index()
+    {
+        var games = await this.gameService.GetAllAsync(new GameQueryDto());
+        
+        var dashboard = new DashboardViewModel
         {
-            _logger = logger;
-        }
+            TotalGames = games.Count,
+            AverageRating = games.Any() ? games.Average(g => g.Rating) : 0,
+            HighestRatedGame = games.OrderByDescending(g => g.Rating).FirstOrDefault(),
+            KidFriendlyGamesCount = games.Count(g => g.PegiRating < 12),
+            GenresCount = games.Select(g => g.Genre).Distinct().Count(),
+            PlatformCounts = Enum.GetValues<GamePlatform>()
+                .Where(platform => platform != GamePlatform.None)
+                .ToDictionary(
+                    platform => platform,
+                    platform => games.Count(game => game.Platforms.HasFlag(platform)))
+        };
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+        return View(dashboard);
+    }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }

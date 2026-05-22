@@ -1,0 +1,43 @@
+@model IEnumerable<Services.DTOs.GameDto>
+
+<div class="table-responsive">
+    <table class="table custom-table align-middle mb-0">
+        <thead>
+            <tr>
+                <th>@UiText.T(Context, "Title")</th>
+                <th>@UiText.T(Context, "Genre")</th>
+                <th>@UiText.T(Context, "Platforms")</th>
+                <th>@UiText.T(Context, "Year")</th>
+                <th>@UiText.T(Context, "Developer")</th>
+                <th>PEGI</th>
+                <th>@UiText.T(Context, "Rating")</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var game in Model)
+            {
+                <tr class="@(game.Title == Common.Constants.GameConstants.FeaturedTitle ? "featured-row" : string.Empty)">
+                    <td>
+                        <strong>@game.Title</strong>
+                        @if (game.Title == Common.Constants.GameConstants.FeaturedTitle)
+                        {
+                            <span class="badge rounded-pill text-bg-warning ms-2">@UiText.T(Context, "Featured")</span>
+                        }
+                    </td>
+                    <td>@UiText.Genre(Context, game.Genre)</td>
+                    <td>@UiText.Platforms(Context, game.Platforms)</td>
+                    <td>@game.ReleaseYear</td>
+                    <td>@game.DeveloperStudio</td>
+                    <td><span class="badge rounded-pill text-bg-secondary">PEGI @game.PegiRating</span></td>
+                    <td><span class="rating-badge">@game.Rating.ToString("F1")</span></td>
+                </tr>
+            }
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="7" class="text-center text-secondary py-4">@UiText.T(Context, "NoGamesFound")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

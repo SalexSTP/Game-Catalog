@@ -1,0 +1,225 @@
+@model Web.ViewModels.Games.GameIndexViewModel
+@using Services.Enums
+@using System.Globalization
+@{
+    ViewData["Title"] = UiText.T(Context, "GameCatalogTitle");
+
+    bool hasActiveFilters = !string.IsNullOrWhiteSpace(Model.SearchTerm)
+        || Model.Genre.HasValue
+        || Model.Platform.HasValue
+        || Model.MaxPegiRating.HasValue
+        || Model.MinRating.HasValue;
+
+    string searchCollapseClass = hasActiveFilters ? "collapse show" : "collapse";
+    string searchExpanded = hasActiveFilters ? "true" : "false";
+}
+
+<section class="page-heading">
+    <div>
+        <span class="eyebrow">@UiText.T(Context, "GameClubLibrary")</span>
+        <h1>@UiText.T(Context, "GameCatalogTitle")</h1>
+        <p class="text-secondary mb-0">@UiText.T(Context, "CatalogDescription")</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary btn-lg">@UiText.T(Context, "AddNewGame")</a>
+</section>
+
+<div class="mb-4">
+    <button class="search-toggle btn btn-soft w-100" type="button" data-bs-toggle="collapse" data-bs-target="#catalogSearchFilters" aria-expanded="@searchExpanded" aria-controls="catalogSearchFilters">
+        <span>
+            <strong>@UiText.T(Context, "Search")</strong>
+            <small>@UiText.T(Context, "SearchHelp")</small>
+        </span>
+        <span class="search-toggle-icon">⌄</span>
+    </button>
+
+    <div class="@searchCollapseClass" id="catalogSearchFilters">
+        <form method="get" class="filter-panel mt-3">
+            @if (!string.IsNullOrEmpty(Model.SortField1))
+            {
+                <input type="hidden" name="SortField1" value="@Model.SortField1" />
+                <input type="hidden" name="SortDescending1" value="@Model.SortDescending1.ToString().ToLowerInvariant()" />
+            }
+
+            <div class="row g-3 align-items-end">
+                <div class="col-lg-4 col-md-6">
+                    <label asp-for="SearchTerm" class="form-label">@UiText.T(Context, "Search")</label>
+                    <input asp-for="SearchTerm" class="form-control" placeholder="@UiText.T(Context, "TitleOrDeveloper")" />
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label asp-for="Genre" class="form-label">@UiText.T(Context, "Genre")</label>
+                    <select asp-for="Genre" asp-items="Model.Genres" class="form-select">
+                        <option value="">@UiText.T(Context, "AllGenres")</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label asp-for="Platform" class="form-label">@UiText.T(Context, "Platform")</label>
+                    <select asp-for="Platform" asp-items="Model.Platforms" class="form-select">
+                        <option value="">@UiText.T(Context, "AllPlatforms")</option>
+                    </select>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label asp-for="MaxPegiRating" class="form-label">@UiText.T(Context, "MaxPegi")</label>
+                    <input asp-for="MaxPegiRating" type="number" class="form-control" min="0" max="21" placeholder="12" />
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <label asp-for="MinRating" class="form-label">@UiText.T(Context, "MinRating")</label>
+                    <input asp-for="MinRating" type="number" step="0.1" min="1" max="10" class="form-control" placeholder="8.5" />
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <button type="submit" class="btn btn-primary">@UiText.T(Context, "ApplySearch")</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">@UiText.T(Context, "Clear")</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div>
+            <h2 class="h5 mb-1">@UiText.T(Context, "Games") <span class="text-secondary">(@Model.Games.Count)</span></h2>
+            <p class="text-secondary small mb-0">@UiText.T(Context, "SortHint")</p>
+        </div>
+        <span class="badge rounded-pill text-bg-primary">@UiText.T(Context, "FeaturedPriority")</span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table custom-table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>
+                        <a class="table-sort-link @(IsActiveSort(nameof(GameSortField.Title)) ? "active" : string.Empty)" href="@Url.Action("Index", "Games", GetSortRoute(Model, nameof(GameSortField.Title)))">
+                            @UiText.T(Context, "Title") <span>@GetSortIcon(nameof(GameSortField.Title))</span>
+                        </a>
+                    </th>
+                    <th>
+                        <a class="table-sort-link @(IsActiveSort(nameof(GameSortField.Genre)) ? "active" : string.Empty)" href="@Url.Action("Index", "Games", GetSortRoute(Model, nameof(GameSortField.Genre)))">
+                            @UiText.T(Context, "Genre") <span>@GetSortIcon(nameof(GameSortField.Genre))</span>
+                        </a>
+                    </th>
+                    <th>@UiText.T(Context, "Platforms")</th>
+                    <th>
+                        <a class="table-sort-link @(IsActiveSort(nameof(GameSortField.ReleaseYear)) ? "active" : string.Empty)" href="@Url.Action("Index", "Games", GetSortRoute(Model, nameof(GameSortField.ReleaseYear)))">
+                            @UiText.T(Context, "Year") <span>@GetSortIcon(nameof(GameSortField.ReleaseYear))</span>
+                        </a>
+                    </th>
+                    <th>
+                        <a class="table-sort-link @(IsActiveSort(nameof(GameSortField.DeveloperStudio)) ? "active" : string.Empty)" href="@Url.Action("Index", "Games", GetSortRoute(Model, nameof(GameSortField.DeveloperStudio)))">
+                            @UiText.T(Context, "Developer") <span>@GetSortIcon(nameof(GameSortField.DeveloperStudio))</span>
+                        </a>
+                    </th>
+                    <th>PEGI</th>
+                    <th>
+                        <a class="table-sort-link @(IsActiveSort(nameof(GameSortField.Rating)) ? "active" : string.Empty)" href="@Url.Action("Index", "Games", GetSortRoute(Model, nameof(GameSortField.Rating)))">
+                            @UiText.T(Context, "Rating") <span>@GetSortIcon(nameof(GameSortField.Rating))</span>
+                        </a>
+                    </th>
+                    <th class="text-end">@UiText.T(Context, "Actions")</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var game in Model.Games)
+                {
+                    <tr class="@(game.Title == Common.Constants.GameConstants.FeaturedTitle ? "featured-row" : string.Empty)">
+                        <td>
+                            <strong>@game.Title</strong>
+                            @if (game.Title == Common.Constants.GameConstants.FeaturedTitle)
+                            {
+                                <span class="badge rounded-pill text-bg-warning ms-2">@UiText.T(Context, "Featured")</span>
+                            }
+                        </td>
+                        <td>@UiText.Genre(Context, game.Genre)</td>
+                        <td>@UiText.Platforms(Context, game.Platforms)</td>
+                        <td>@game.ReleaseYear</td>
+                        <td>@game.DeveloperStudio</td>
+                        <td><span class="badge rounded-pill text-bg-secondary">PEGI @game.PegiRating</span></td>
+                        <td><span class="rating-badge">@game.Rating.ToString("F1")</span></td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm game-actions" role="group" aria-label="Game actions">
+                                <a asp-action="Edit" asp-route-id="@game.Id" class="btn btn-outline-light" title="@UiText.T(Context, "Edit")" aria-label="@UiText.T(Context, "Edit") @game.Title">
+                                    <i class="bi bi-pencil" aria-hidden="true"></i>
+                                </a>
+                                <form asp-action="Delete" asp-route-id="@game.Id" method="post" onsubmit="return confirm('@UiText.T(Context, "DeleteConfirm")');">
+                                    <button type="submit" class="btn btn-outline-danger" title="@UiText.T(Context, "Delete")" aria-label="@UiText.T(Context, "Delete") @game.Title">
+                                        <i class="bi bi-trash" aria-hidden="true"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Games.Any())
+                {
+                    <tr>
+                        <td colspan="8" class="text-center text-secondary py-5">@UiText.T(Context, "NoGamesMatch")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@functions {
+    private bool IsActiveSort(string field)
+    {
+        return string.Equals(Model.SortField1, field, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private string GetSortIcon(string field)
+    {
+        if (!IsActiveSort(field))
+        {
+            return "↕";
+        }
+
+        return Model.SortDescending1 ? "↓" : "↑";
+    }
+
+    private Dictionary<string, object?> GetSortRoute(Web.ViewModels.Games.GameIndexViewModel model, string field)
+    {
+        var route = new Dictionary<string, object?>();
+
+        if (!string.IsNullOrWhiteSpace(model.SearchTerm))
+        {
+            route["SearchTerm"] = model.SearchTerm;
+        }
+
+        if (model.Genre.HasValue)
+        {
+            route["Genre"] = model.Genre.Value;
+        }
+
+        if (model.Platform.HasValue)
+        {
+            route["Platform"] = model.Platform.Value;
+        }
+
+        if (model.MaxPegiRating.HasValue)
+        {
+            route["MaxPegiRating"] = model.MaxPegiRating.Value;
+        }
+
+        if (model.MinRating.HasValue)
+        {
+            route["MinRating"] = model.MinRating.Value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        bool sameField = string.Equals(model.SortField1, field, StringComparison.OrdinalIgnoreCase);
+
+        if (!sameField)
+        {
+            route["SortField1"] = field;
+            route["SortDescending1"] = false;
+            return route;
+        }
+
+        if (!model.SortDescending1)
+        {
+            route["SortField1"] = field;
+            route["SortDescending1"] = true;
+        }
+
+        return route;
+    }
+}

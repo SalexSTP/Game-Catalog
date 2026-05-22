@@ -1,0 +1,66 @@
+@model Web.ViewModels.Games.GameFormViewModel
+@using Domain.Enums
+@using static Common.Constants.GameConstants
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label">@UiText.T(Context, "Title")</label>
+            <input asp-for="Title" class="form-control form-control-lg" placeholder="@UiText.T(Context, "TitlePlaceholder")" />
+            <span asp-validation-for="Title" class="text-danger small"></span>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="mb-3">
+            <label asp-for="DeveloperStudio" class="form-label">@UiText.T(Context, "DeveloperStudio")</label>
+            <input asp-for="DeveloperStudio" class="form-control form-control-lg" placeholder="@UiText.T(Context, "DeveloperPlaceholder")" />
+            <span asp-validation-for="DeveloperStudio" class="text-danger small"></span>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="Genre" class="form-label">@UiText.T(Context, "Genre")</label>
+        <select asp-for="Genre" class="form-select">
+            <option value="">@UiText.T(Context, "ChooseGenre")</option>
+            @foreach (var genre in Enum.GetValues<GameGenre>())
+            {
+                <option value="@genre">@UiText.Genre(Context, genre)</option>
+            }
+        </select>
+        <span asp-validation-for="Genre" class="text-danger small"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="PegiRating" class="form-label">@UiText.T(Context, "PegiRating")</label>
+        <input asp-for="PegiRating" class="form-control" type="number" min="@MinPegiAge" max="@MaxPegiAge" />
+        <span asp-validation-for="PegiRating" class="text-danger small"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="ReleaseYear" class="form-label">@UiText.T(Context, "Year")</label>
+        <input asp-for="ReleaseYear" class="form-control" type="number" min="@MinReleaseYear" max="@MaxReleaseYear" />
+        <span asp-validation-for="ReleaseYear" class="text-danger small"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="Rating" class="form-label">@UiText.T(Context, "UserRating")</label>
+        <input asp-for="Rating" class="form-control" type="number" min="@MinRating" max="@MaxRating" step="0.1" />
+        <div class="form-text">@UiText.T(Context, "RatingRangeHelp", MinRating.ToString("F1"), MaxRating.ToString("F1"))</div>
+        <span asp-validation-for="Rating" class="text-danger small"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="SelectedPlatforms" class="form-label">@UiText.T(Context, "Platforms")</label>
+        <div class="platform-picker">
+            @foreach (var platform in Enum.GetValues<GamePlatform>().Where(p => p != GamePlatform.None))
+            {
+                string checkboxId = $"platform-{platform}";
+                bool isChecked = Model.SelectedPlatforms.Contains(platform);
+                <input class="btn-check" type="checkbox" name="SelectedPlatforms" value="@platform" id="@checkboxId" @(isChecked ? "checked" : null) />
+                <label class="btn btn-outline-light platform-choice" for="@checkboxId">@UiText.Platform(Context, platform)</label>
+            }
+        </div>
+        <span asp-validation-for="SelectedPlatforms" class="text-danger small d-block mt-2"></span>
+    </div>
+</div>

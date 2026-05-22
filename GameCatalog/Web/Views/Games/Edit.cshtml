@@ -1,0 +1,31 @@
+@model Web.ViewModels.Games.GameFormViewModel
+@using Domain.Enums
+@using static Common.Constants.GameConstants
+@{
+    ViewData["Title"] = UiText.T(Context, "EditGameHeading");
+}
+
+<section class="page-heading">
+    <div>
+        <span class="eyebrow">@UiText.T(Context, "CatalogManagement")</span>
+        <h1>@UiText.T(Context, "EditGameHeading")</h1>
+        <p class="text-secondary mb-0">@UiText.T(Context, "EditGameDescription")</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-light">@UiText.T(Context, "BackToCatalog")</a>
+</section>
+
+<div class="form-shell">
+    <form asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        @await Html.PartialAsync("_GameFormFields", Model)
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary px-4">@UiText.T(Context, "SaveChanges")</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">@UiText.T(Context, "Cancel")</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

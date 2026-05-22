@@ -1,42 +1,68 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+@using Web.Localization
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentLanguage = UiText.GetLanguage(Context);
+    var returnUrl = Context.Request.Path + Context.Request.QueryString;
+}
+<!DOCTYPE html>
+<html lang="@currentLanguage" data-bs-theme="dark">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Web</title>
+    <title>@ViewData["Title"] - GameClub Catalog</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Web.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+    <header class="app-header">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="brand-mark">GC</span>
+                    <span>GameClub</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link @(currentController == "Home" ? "active" : string.Empty)" asp-area="" asp-controller="Home" asp-action="Index">@UiText.T(Context, "Home")</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(currentController == "Games" ? "active" : string.Empty)" asp-area="" asp-controller="Games" asp-action="Index">@UiText.T(Context, "Catalog")</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link @(currentController == "Reports" ? "active" : string.Empty)" asp-area="" asp-controller="Reports" asp-action="Index">@UiText.T(Context, "Reports")</a>
                         </li>
                     </ul>
+
+                    <form asp-controller="Language" asp-action="Set" method="post" class="language-switch ms-lg-3 mt-3 mt-lg-0">
+                        <input type="hidden" name="returnUrl" value="@returnUrl" />
+                        <button type="submit" name="language" value="en" class="btn btn-sm @(currentLanguage == "en" ? "btn-primary" : "btn-outline-light")">EN</button>
+                        <button type="submit" name="language" value="bg" class="btn btn-sm @(currentLanguage == "bg" ? "btn-primary" : "btn-outline-light")">BG</button>
+                    </form>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+    <div class="container app-container">
+        <main role="main" class="pb-5">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        @*TODO*@
+    <footer class="app-footer">
+        <div class="container d-flex flex-wrap justify-content-between gap-2">
+            <span>@UiText.T(Context, "FooterTitle")</span>
+            <span>@UiText.T(Context, "FooterSubtitle")</span>
+        </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

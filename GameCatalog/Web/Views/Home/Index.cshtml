@@ -1,8 +1,110 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model Web.ViewModels.Home.DashboardViewModel
+@using static Common.Constants.GameConstants
+@{
+    ViewData["Title"] = UiText.T(Context, "DashboardTitle");
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="hero-panel hero-panel-compact mb-3">
+    <div class="row align-items-center g-3">
+        <div class="col-lg-7">
+            <span class="eyebrow">@UiText.T(Context, "HomeEyebrow")</span>
+            <h1 class="display-6 fw-bold mt-2 mb-2">@UiText.T(Context, "HomeHeading")</h1>
+            <p class="text-secondary mb-3">
+                @UiText.T(Context, "HomeIntro")
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <a asp-controller="Games" asp-action="Index" class="btn btn-primary">@UiText.T(Context, "BrowseCatalog")</a>
+                <a asp-controller="Games" asp-action="Create" class="btn btn-outline-light">@UiText.T(Context, "AddGame")</a>
+                <a asp-controller="Reports" asp-action="Index" class="btn btn-soft">@UiText.T(Context, "ViewReports")</a>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="requirement-card">
+                <h2 class="h6 mb-2">@UiText.T(Context, "ImplementedRequirements")</h2>
+                <div class="requirement-list">
+                    <span>@UiText.T(Context, "ReqMaxGames", MaxGamesCount)</span>
+                    <span>@UiText.T(Context, "ReqMultiplePlatforms")</span>
+                    <span>@UiText.T(Context, "ReqCombinedSorting")</span>
+                    <span>@UiText.T(Context, "ReqReports")</span>
+                    <span>@UiText.T(Context, "ReqFeatured")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="row g-3 mb-3 dashboard-grid">
+    <div class="col-lg-6">
+        <div class="stat-card stat-card-large h-100">
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                <div>
+                    <p class="stat-label">@UiText.T(Context, "TotalGames")</p>
+                    <div class="stat-value">@Model.TotalGames <span>/ @MaxGamesCount</span></div>
+                </div>
+                <span class="stat-icon">🎮</span>
+            </div>
+
+            <div class="platform-breakdown">
+                @foreach (var platform in Model.PlatformCounts)
+                {
+                    <div class="platform-pill">
+                        <span>@UiText.Platform(Context, platform.Key)</span>
+                        <strong>@platform.Value</strong>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card h-100">
+            <p class="stat-label">@UiText.T(Context, "AverageRating")</p>
+            <div class="stat-value">@Model.AverageRating.ToString("F1")</div>
+            <p class="stat-hint">@UiText.T(Context, "AcrossAllGames")</p>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card h-100">
+            <p class="stat-label">@UiText.T(Context, "KidFriendly")</p>
+            <div class="stat-value">@Model.KidFriendlyGamesCount</div>
+            <p class="stat-hint">@UiText.T(Context, "PegiUnder", PegiUnderAgeLimit)</p>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="stat-card h-100">
+            <p class="stat-label">@UiText.T(Context, "HighestRatedGame")</p>
+            @if (Model.HighestRatedGame is not null)
+            {
+                <h2 class="h4 mb-2">@Model.HighestRatedGame.Title</h2>
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <span class="badge rounded-pill text-bg-success">@Model.HighestRatedGame.Rating.ToString("F1") / 10</span>
+                    <span class="badge rounded-pill text-bg-secondary">@UiText.Genre(Context, Model.HighestRatedGame.Genre)</span>
+                    <span class="badge rounded-pill text-bg-secondary">@Model.HighestRatedGame.ReleaseYear</span>
+                </div>
+            }
+            else
+            {
+                <p class="text-secondary mb-0">@UiText.T(Context, "NoGamesAdded")</p>
+            }
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card h-100">
+            <p class="stat-label">@UiText.T(Context, "Genres")</p>
+            <div class="stat-value">@Model.GenresCount</div>
+            <p class="stat-hint">@UiText.T(Context, "RepresentedInCatalog")</p>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card h-100 quick-actions-card">
+            <p class="stat-label">@UiText.T(Context, "QuickActions")</p>
+            <a asp-controller="Games" asp-action="Index" class="quick-link">@UiText.T(Context, "OpenCatalog")</a>
+            <a asp-controller="Reports" asp-action="Index" class="quick-link">@UiText.T(Context, "OpenReports")</a>
+            <a asp-controller="Games" asp-action="Create" class="quick-link">@UiText.T(Context, "AddNewGame")</a>
+        </div>
+    </div>
+</section>

@@ -22,6 +22,34 @@ public sealed class GameService : IGameService
     {
         IQueryable<Game> gamesQuery = this.gameRepository.AllAsNoTracking();
 
+        if (!string.IsNullOrWhiteSpace(query.SearchTerm))
+        {
+            string searchTermLower = query.SearchTerm.ToLower();
+            gamesQuery = gamesQuery.Where(g => 
+                g.Title.ToLower().Contains(searchTermLower) || 
+                g.DeveloperStudio.ToLower().Contains(searchTermLower));
+        }
+
+        if (query.Genre.HasValue)
+        {
+            gamesQuery = gamesQuery.Where(g => g.Genre == query.Genre.Value);
+        }
+
+        if (query.Platform.HasValue)
+        {
+            gamesQuery = gamesQuery.Where(g => g.Platforms.HasFlag(query.Platform.Value));
+        }
+
+        if (query.MaxPegiRating.HasValue)
+        {
+            gamesQuery = gamesQuery.Where(g => g.PegiRating <= query.MaxPegiRating.Value);
+        }
+
+        if (query.MinRating.HasValue)
+        {
+            gamesQuery = gamesQuery.Where(g => g.Rating >= query.MinRating.Value);
+        }
+
         gamesQuery = ApplySorting(gamesQuery, query.SortCriteria);
 
         return await gamesQuery
