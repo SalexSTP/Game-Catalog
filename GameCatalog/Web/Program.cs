@@ -1,5 +1,8 @@
 using Data;
+using Data.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Services.Implementations;
+using Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +11,10 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<GameCatalogDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+builder.Services.AddScoped<IGameService, GameService>();
 
 var app = builder.Build();
 

@@ -17,6 +17,9 @@ public sealed class GameCatalogDbContext(DbContextOptions<GameCatalogDbContext> 
         {
             entity.HasKey(g => g.Id);
 
+            entity.Property(g => g.Id)
+                .HasDefaultValueSql("NEWSEQUENTIALID()");
+
             entity.Property(g => g.Title)
                 .IsRequired()
                 .HasMaxLength(TitleMaxLength);
