@@ -1,6 +1,6 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Web.Models;
+using System.Diagnostics;
+using Web.ViewModels;
 
 namespace Web.Controllers
 {
@@ -14,11 +14,6 @@ namespace Web.Controllers
         }
 
         public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
         {
             return View();
         }
